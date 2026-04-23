@@ -32,6 +32,12 @@ micro_rocks <- micro_global(loc = loc,
                       soiltype = 0, # sets soil type to rock
                       REFL = 1e-6 # solar radiation reflection, this value makes a dark rock that abosrbs a lot of heat from the sun
 )
+micro_water <- micro_global(loc = loc,
+                            runshade = 0, # switching off shading model
+                            minshade = 0, # switching off shading model
+                            soiltype = 1, # sets soil type to rock
+                            PCTWET = 100
+)
 
 # refer to https://mrke.github.io/NicheMapR/inst/doc/microclimate-IO and https://mrke.github.io/NicheMapR/inst/doc/microclimate-model-tutorial for interpretation of the input arguments and output named values
 
@@ -46,8 +52,11 @@ dense_veg <- as.data.frame(micro$shadsoil) %>%
 heated <- as.data.frame(micro_rocks$soil) %>% 
   select("DOY","TIME","D0cm")%>% 
   mutate(habitat = "rock in sun")
+pond <- as.data.frame(micro_water$soil) %>% 
+  select("DOY","TIME","D0cm")%>% 
+  mutate(habitat = "pond surface in sun")
 
-habitats <- bind_rows(light_veg,dense_veg,heated) %>% 
+habitats <- bind_rows(light_veg,dense_veg,heated,pond) %>% 
   mutate(month = month(as_date(DOY, origin = "2023-01-01"), 
                        label = TRUE, 
                        abbr = TRUE))
@@ -73,10 +82,14 @@ dense_veg_humidity <- as.data.frame(micro$shadmet) %>%
 heated_humidity <- as.data.frame(micro_rocks$metout) %>% 
   select("DOY","TIME","RHLOC")%>% 
   mutate(habitat = "rock in sun")
+pond_humidity <- as.data.frame(micro_water$metout) %>% 
+  select("DOY","TIME","RHLOC")%>% 
+  mutate(habitat = "pond surface in sun")
 
 habitats_humidity <- bind_rows(light_veg_humidity,
                                dense_veg_humidity,
-                               heated_humidity) %>% 
+                               heated_humidity,
+                               pond_humidity) %>% 
   mutate(month = month(as_date(DOY, origin = "2023-01-01"), 
                        label = TRUE, 
                        abbr = TRUE))
@@ -91,6 +104,8 @@ humidity_plot <- ggplot(habitats_humidity,aes(x =TIME, y = RHLOC, colour = habit
   ggtitle("Micro habitat humidity in western Melbourne")
 
 wrap_plots(temp_plot,
-           humidity_plot,nrow = 2, ncol = 1,guides = "collect")
+           humidity_plot,nrow = 2, ncol = 1,guides = "collect",
+           axis_titles = "collect",
+           axes = "collect")
 
 ggsave("figs/demo-timeseries_both.png",width = 8, height = 8, unit = "in")
