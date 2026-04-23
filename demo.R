@@ -13,6 +13,8 @@ get.global.climate(folder="data/")
 
 # as an example extract micro climate for a point location near western treatment plant in Melbourne - the coordinate is from the real life location of a growling grass frog sighting on Atlas of Living Australia https://biocache.ala.org.au/occurrences/120f9433-5f3b-4a47-bf32-31643e9b53fa
 loc <- c(144.5963,-37.9714)
+# note this point prediction can be viewed as representative of an area, such that by sampling multiple points on a spatial grid we can obtain spatially continuous raster predictions
+
 
 # in all following simulations I have chosen arbitrary values for shading and for reflectiveness of rock surfaces, these values should be compared against experimental estimates where available
 
@@ -30,6 +32,9 @@ micro_rocks <- micro_global(loc = loc,
                       soiltype = 0, # sets soil type to rock
                       REFL = 1e-6 # solar radiation reflection, this value makes a dark rock that abosrbs a lot of heat from the sun
 )
+
+# refer to https://mrke.github.io/NicheMapR/inst/doc/microclimate-IO and https://mrke.github.io/NicheMapR/inst/doc/microclimate-model-tutorial for interpretation of the input arguments and output named values
+
 
 # wrangling of prediction results for plotting
 light_veg <- as.data.frame(micro$soil) %>% 
